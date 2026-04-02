@@ -1,0 +1,124 @@
+/* Container to keep everything centered */
+.results-page {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Keeping background clean so only cards stand out */
+  /* background: #f0f7ff;  */
+}
+.step-card {
+  opacity: 0;
+  transform: translateY(10px); /* start slightly below */
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.step-card.active {
+  opacity: 1;
+  transform: translateY(0); /* move to place */
+}
+
+.step-card.completed {
+  opacity: 1;
+  transform: translateY(0);
+  /* optional: maybe change color or background */
+  background-color: #d4edda; /* greenish for completed */
+}
+.results-content {
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Removed the heavy blue background here */
+.verification-steps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px; /* Increased gap for better card definition */
+  width: 100%;
+  max-width: 450px; 
+  background-color: transparent; /* No background for the container */
+}
+
+/* Base Card Style (The "Shaded" look) */
+.step-card {
+  width: 100%;
+  /* Light blue tinted background for that "shaded" look */
+  background: rgba(172, 216, 254, 0.4); 
+  border: 1px solid rgba(135, 196, 255, 0.5);
+  border-radius: 16px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  color: #2d3748; /* Darker text for readability on light blue */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* COMPLETED STATE: Greenish tint and border */
+.step-card.completed {
+  background: rgba(209, 250, 229, 0.6);
+  border: 2px solid #10b981;
+  opacity: 1;
+}
+
+/* ACTIVE STATE: Brighter blue with glowing border */
+.step-card.active {
+  background: rgba(191, 219, 254, 0.8);
+  border: 2px solid #3b82f6;
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2);
+}
+
+/* PENDING/INACTIVE STATE: Faded blue */
+.step-card:not(.active):not(.completed) {
+  opacity: 0.5;
+  background: rgba(172, 216, 254, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Text Styling */
+.step-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1a202c;
+  margin-bottom: 2px;
+}
+
+.step-description {
+  font-size: 0.85rem;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* Indicator (Checkmark or Dot) */
+.step-indicator {
+  margin-right: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+}
+
+/* Progress Bar Styling */
+.progress-container {
+  margin-top: 40px;
+  height: 6px;
+  width: 300px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.6s ease;
+}

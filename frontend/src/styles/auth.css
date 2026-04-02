@@ -1,0 +1,309 @@
+/* ===== BACKGROUND ===== */
+.auth-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eaf3fb, #cfe3f6, #a8c8e8);
+}
+
+/* ===== CARD ===== */
+.auth-card {
+  position: relative;
+  width: 1200px;
+  height: 600px;
+
+  border-radius: 20px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  align-items: center;
+}
+
+/* ===== FORM ===== */
+.auth-left {
+  width: 50%;
+  /* 🔥 wider form */
+  padding: 80px 100px;
+  /* 🔥 more breathing space */
+}
+
+/* TEXT */
+.auth-left h2 {
+  font-size: 36px;
+  margin-bottom: 8px;
+  color: #2b3a55;
+}
+
+.subtitle {
+  color: #6b7c93;
+  margin-bottom: 30px;
+}
+
+/* FORM */
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* INPUTS */
+.auth-left input {
+  width: 100%;
+  /* 🔥 full width */
+  padding: 15px;
+  margin-bottom: 18px;
+
+  border-radius: 10px;
+  border: 1px solid #e0e6ed;
+
+  background: white;
+  outline: none;
+}
+
+.auth-left input:focus {
+  border-color: #4a90e2;
+}
+
+/* BUTTON */
+.auth-left button {
+  width: 100%;
+  /* 🔥 full width */
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #4a90e2, #6bb7ff);
+  color: white;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.auth-left button:hover {
+  box-shadow: 0 6px 15px rgba(74, 144, 226, 0.25);
+}
+
+/* SWITCH TEXT */
+.switch-text {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #555;
+}
+
+.switch-text a {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* ===== IMAGE ===== */
+.auth-card::after {
+  content: "";
+  position: absolute;
+
+  right: -20px;
+  /* 🔥 slight push outward */
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 62%;
+  /* 🔥 was 55% → increase */
+  height: 105%;
+  /* 🔥 slightly taller */
+
+  background: url("/login.png") no-repeat center;
+  background-size: contain;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .auth-card {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .auth-left {
+    width: 100%;
+    padding: 40px;
+  }
+
+  .auth-card::after {
+    display: none;
+  }
+
+  /* frontend/src/styles/auth.css */
+
+  /* Container for full screen */
+  .auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* Full viewport height */
+    background-color: #f5f5f5;
+    padding: 20px;
+    /* Margin from edges */
+  }
+
+  /* Card wrapper */
+  .auth-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    width: 100%;
+    max-height: 80vh;
+    /* Limit max height */
+    overflow-y: auto;
+    /* Make scrollable if content exceeds height */
+    padding: 30px;
+    box-sizing: border-box;
+  }
+
+  /* Left section inside card (form) */
+  .auth-left {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* spacing between elements */
+  }
+
+  /* Form styles */
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .form input[type="text"],
+  .form input[type="email"],
+  .form input[type="password"] {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Buttons */
+  .form button {
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .form button:hover {
+    background-color: #0056b3;
+  }
+
+  /* Subtitle */
+  .subtitle {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+
+  /* Switch text below form */
+  .switch-text {
+    font-size: 14px;
+    color: #333;
+    margin-top: 10px;
+  }
+
+  /* Watchlist section scrollable if too many items */
+  .watchlist-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 150px;
+    /* Adjust as needed */
+    overflow-y: auto;
+    /* scroll if too many companies */
+    padding-right: 5px;
+  }
+
+  /* Watchlist checkbox label */
+  .watchlist-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  /* Error message */
+  .error {
+    color: red;
+    font-size: 13px;
+    margin-top: 5px;
+  }
+
+  /* Responsive for small screens */
+  @media (max-width: 480px) {
+    .auth-card {
+      max-width: 95%;
+      padding: 20px;
+    }
+  }
+
+  .dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #333;
+    /* Dark background */
+    color: #fff;
+    /* White text */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+
+  /* Scrollbar for Webkit browsers (Chrome, Edge, Safari) */
+  .dropdown-list::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .dropdown-list::-webkit-scrollbar-track {
+    background: #444;
+    /* Dark track */
+    border-radius: 8px;
+  }
+
+  .dropdown-list::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Dark thumb */
+    border-radius: 8px;
+    border: 2px solid #444;
+    /* Adds padding effect */
+  }
+
+  .dropdown-list::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+    /* Lighten on hover */
+  }
+
+  /* Firefox scrollbar */
+  .dropdown-list {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #444;
+    /* thumb color, track color */
+  }
+
+}

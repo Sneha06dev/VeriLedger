@@ -1,0 +1,24 @@
+1
+00:00:00,000 --> 00:00:02,200
+Get transcript from YouTube video.
+
+2
+00:00:02,200 --> 00:00:05,100
+First, open the YouTube app on your device,
+
+3
+00:00:05,100 --> 00:00:08,200
+and tap on the video for which you want to get the transcript.
+
+4
+00:00:08,200 --> 00:00:11,500
+Now at the description, tap on more.
+
+5
+00:00:11,500 --> 00:00:14,000
+Here, click on the show transcript.
+
+6
+00:00:14,000 --> 00:00:16,500
+You can see the transcript, and that's it.
+

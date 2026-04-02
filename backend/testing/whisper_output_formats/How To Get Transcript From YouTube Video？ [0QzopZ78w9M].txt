@@ -1,0 +1,6 @@
+Get transcript from YouTube video.
+First, open the YouTube app on your device,
+and tap on the video for which you want to get the transcript.
+Now at the description, tap on more.
+Here, click on the show transcript.
+You can see the transcript, and that's it.

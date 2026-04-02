@@ -1,0 +1,56 @@
+/* ===== GLOBAL RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== ROOT BASE ===== */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+/* ===== BODY ===== */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+
+  background: transparent;   /* ✅ VERY IMPORTANT (no override) */
+  color: #111827;
+
+  overflow-x: hidden;
+}
+
+/* ===== APP ROOT WRAPPER ===== */
+.app {
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ===== REMOVE DEFAULT STYLES INTERFERENCE ===== */
+
+/* Remove global section styling */
+section {
+  all: unset;
+}
+
+/* Remove default button styles interference */
+button {
+  font-family: inherit;
+}
+
+/* Remove default input styles interference */
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* ===== SCROLLBAR (OPTIONAL CLEAN UI) ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
