@@ -2,8 +2,6 @@ const axios = require("axios");
 
 const getUpcomingCalendarEvents = async () => {
   try {
-    console.log("🌐 Calling RapidAPI earnings calendar endpoint...");
-    
     const response = await axios.get(
       "https://earnings-calendar.p.rapidapi.com/upcoming",
       {
@@ -17,17 +15,28 @@ const getUpcomingCalendarEvents = async () => {
       }
     );
 
-    console.log("✅ API Response received successfully!");
-    console.log("📊 Number of earnings events:", response.data.length || response.data?.data?.length);
-    console.log("🔍 Full response:", JSON.stringify(response.data, null, 2));
-    
-    return response.data;
+    const rawData = response.data;
+    const grouped = {};
+
+    rawData.forEach(event => {
+      const date = event.date;
+
+      if (!grouped[date]) grouped[date] = [];
+
+      grouped[date].push({
+        name: event.company || event.symbol,
+        ticker: event.symbol,
+        time: event.time || "AMC",
+        eps: event.eps || "-",
+        revenue: event.revenue || "-",
+        call: "#" // we will replace this later
+      });
+    });
+
+    return grouped;
+
   } catch (error) {
-    console.error("❌ API Error:", error.message);
-    if (error.response) {
-      console.error("Status:", error.response.status);
-      console.error("Response data:", error.response.data);
-    }
+    console.error("API Error:", error.message);
     throw error;
   }
 };

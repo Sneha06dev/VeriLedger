@@ -1,54 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Calendar.css";
 import { useNavigate } from "react-router-dom";
-const earningsData = {
-  "2026-03-02": [
-    { name: "Oracle", ticker: "ORCL", time: "AMC", eps: "1.12", revenue: "$13B", call: "#" },
-  ],
-  "2026-03-05": [
-    { name: "Meta", ticker: "META", time: "AMC", eps: "3.21", revenue: "$36B", call: "#" },
-  ],
-  "2026-03-08": [
-    { name: "Intel", ticker: "INTC", time: "BMO", eps: "0.45", revenue: "$15B", call: "#" },
-  ],
-  "2026-03-10": [
-    { name: "Netflix", ticker: "NFLX", time: "AMC", eps: "2.45", revenue: "$9B", call: "#" },
-  ],
-  "2026-03-12": [
-    { name: "Adobe", ticker: "ADBE", time: "BMO", eps: "4.1", revenue: "$5B", call: "#" },
-  ],
-  "2026-03-15": [
-    { name: "Nvidia", ticker: "NVDA", time: "AMC", eps: "5.02", revenue: "$28B", call: "#" },
-  ],
-  "2026-03-18": [
-    { name: "AMD", ticker: "AMD", time: "AMC", eps: "0.95", revenue: "$7B", call: "#" },
-  ],
-  "2026-03-20": [
-    { name: "Google", ticker: "GOOGL", time: "AMC", eps: "1.89", revenue: "$80B", call: "#" },
-  ],
-  "2026-03-22": [
-    { name: "Salesforce", ticker: "CRM", time: "BMO", eps: "1.5", revenue: "$9B", call: "#" },
-  ],
-  "2026-03-25": [
-    { name: "Uber", ticker: "UBER", time: "AMC", eps: "0.32", revenue: "$10B", call: "#" },
-  ],
-  "2026-03-26": [
-    { name: "Apple", ticker: "AAPL", time: "AMC", eps: "1.42", revenue: "$94B", call: "#" },
-    { name: "Tesla", ticker: "TSLA", time: "BMO", eps: "0.82", revenue: "$25B", call: "#" },
-  ],
-  "2026-03-26": [
-    { name: "Microsoft", ticker: "MSFT", time: "AMC", eps: "2.78", revenue: "$61B", call: "#" },
-    { name: "Amazon", ticker: "AMZN", time: "BMO", eps: "0.98", revenue: "$142B", call: "#" },
-  ],
-};
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default function Calendar() {
+  const [earningsData, setEarningsData] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [subscribed, setSubscribed] = useState({});
   const [search, setSearch] = useState("");
+
+  // ✅ Dynamic date state
+  const [currentDate, setCurrentDate] = useState(new Date());
+
   const navigate = useNavigate();
+
+  // ✅ Fetch data
+  useEffect(() => {
+    fetch("http://localhost:5000/api/calendar/upcoming")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Calendar data:", data);
+        setEarningsData(data);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  // ✅ Extract year/month dynamically
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // ✅ FIXED DATE FORMAT (CRITICAL)
+  const formatDate = (d) => {
+    const date = new Date(year, month, d);
+    return date.toISOString().split("T")[0];
+  };
+
+  // ✅ Month navigation
+  const prevMonth = () => {
+    setCurrentDate(new Date(year, month - 1, 1));
+  };
+
+  const nextMonth = () => {
+    setCurrentDate(new Date(year, month + 1, 1));
+  };
 
   const toggleSubscribe = (ticker) => {
     setSubscribed((prev) => ({
@@ -57,21 +56,14 @@ export default function Calendar() {
     }));
   };
 
-  const year = 2026;
-  const month = 2;
-
-  const firstDay = new Date(year, month, 1).getDay();
-  const startOffset = firstDay === 0 ? 6 : firstDay - 1;
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const formatDate = (d) => `2026-03-${String(d).padStart(2, "0")}`;
-
   const cells = [];
 
+  // Empty cells
   for (let i = 0; i < startOffset; i++) {
     cells.push(<div key={"e" + i} className="cell empty"></div>);
   }
 
+  // Days
   for (let d = 1; d <= daysInMonth; d++) {
     const key = formatDate(d);
 
@@ -107,14 +99,13 @@ export default function Calendar() {
       <button className="home-btn" onClick={() => navigate("/")}>
         ⬅ Home
       </button>
-      {/* 🎬 VIDEO */}
+
       <video autoPlay muted loop className="bg-video">
         <source src="/bg.mp4" type="video/mp4" />
       </video>
 
       <div className="overlay"></div>
 
-      {/* CONTENT */}
       <div className="content-wrapper">
         <div className="wrapper">
 
@@ -123,9 +114,16 @@ export default function Calendar() {
 
             <div className="header-controls">
               <div className="nav">
-                <button className="nav-btn">←</button>
-                <span className="month">March 2026</span>
-                <button className="nav-btn">→</button>
+                <button className="nav-btn" onClick={prevMonth}>←</button>
+
+                <span className="month">
+                  {currentDate.toLocaleString("default", {
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </span>
+
+                <button className="nav-btn" onClick={nextMonth}>→</button>
               </div>
 
               <input
@@ -146,7 +144,7 @@ export default function Calendar() {
           <div className="grid">{cells}</div>
 
           {/* SIDEBAR */}
-          {selectedDate && (
+          {selectedDate && earningsData[selectedDate] && (
             <div className="sidebar">
               <div className="sidebar-header">
                 <h2>{selectedDate}</h2>
@@ -174,7 +172,7 @@ export default function Calendar() {
                     </div>
                   </div>
 
-                  <a href={c.call} target="_blank" className="call">
+                  <a href={c.call} target="_blank" rel="noreferrer" className="call">
                     ▶ View Earnings Call
                   </a>
 
