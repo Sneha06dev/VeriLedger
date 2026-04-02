@@ -1,0 +1,32 @@
+const COMPANY_SYMBOLS = {
+  "Apple": "AAPL", "Microsoft": "MSFT", "Alphabet": "GOOGL", "Amazon": "AMZN",
+  "Meta Platforms": "META", "Nvidia": "NVDA", "Tesla": "TSLA", "Adobe": "ADBE",
+  "Oracle": "ORCL", "Intel": "INTC", "Salesforce": "CRM", "Advanced Micro Devices": "AMD",
+  "Qualcomm": "QCOM", "Cisco Systems": "CSCO", "IBM": "IBM", "ServiceNow": "NOW",
+  "Palo Alto Networks": "PANW", "Snowflake": "SNOW", "Palantir": "PLTR", "Shopify": "SHOP",
+  "JPMorgan Chase": "JPM", "Bank of America": "BAC", "Wells Fargo": "WFC",
+  "Goldman Sachs": "GS", "Morgan Stanley": "MS", "BlackRock": "BLK", "Citigroup": "C",
+  "American Express": "AXP", "Charles Schwab": "SCHW", "U.S. Bancorp": "USB",
+  "PNC Financial": "PNC", "Truist Financial": "TFC", "Capital One": "COF",
+  "American International Group": "AIG", "Bank of New York Mellon": "BK",
+  "Johnson & Johnson": "JNJ", "Pfizer": "PFE", "Merck": "MRK", "AbbVie": "ABBV",
+  "Eli Lilly": "LLY", "Bristol-Myers Squibb": "BMY", "Gilead Sciences": "GILD",
+  "Amgen": "AMGN", "CVS Health": "CVS", "UnitedHealth Group": "UNH",
+  "Medtronic": "MDT", "Thermo Fisher Scientific": "TMO", "Intuitive Surgical": "ISRG",
+  "Walmart": "WMT", "Costco": "COST", "Home Depot": "HD", "Lowe's": "LOW",
+  "Nike": "NKE", "McDonald's": "MCD", "Starbucks": "SBUX", "Target": "TGT",
+  "Booking Holdings": "BKNG", "eBay": "EBAY", "Etsy": "ETSY", "TJX Companies": "TJX",
+  "Dollar General": "DG", "Dollar Tree": "DLTR", "ExxonMobil": "XOM", "Chevron": "CVX",
+  "ConocoPhillips": "COP", "EOG Resources": "EOG", "Schlumberger": "SLB",
+  "Phillips 66": "PSX", "Marathon Petroleum": "MPC", "Kinder Morgan": "KMI",
+  "Valero Energy": "VLO", "Halliburton": "HAL", "Boeing": "BA", "Caterpillar": "CAT",
+  "Deere": "DE", "General Electric": "GE", "Honeywell": "HON", "RTX Corporation": "RTX",
+  "Lockheed Martin": "LMT", "UPS": "UPS", "FedEx": "FDX", "Union Pacific": "UNP",
+  "CSX": "CSX", "Norfolk Southern": "NSC", "Verizon": "VZ", "AT&T": "T",
+  "T-Mobile": "TMUS", "Walt Disney": "DIS", "Comcast": "CMCSA", "Netflix": "NFLX",
+  "Warner Bros Discovery": "WBD", "Visa": "V", "Mastercard": "MA", "PayPal": "PYPL",
+  "Block": "SQ", "Fidelity National Information Services": "FIS", "Fiserv": "FI",
+  "Global Payments": "GPN"
+};
+
+module.exports = { COMPANY_SYMBOLS };
