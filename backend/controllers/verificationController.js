@@ -227,3 +227,74 @@ exports.getEvidenceStats = async (req, res) => {
     });
   }
 };
+
+/**
+ * GET /api/verify/claims/by-video
+ * Fetch claims by video URL
+ */
+exports.getClaimsByVideo = async (req, res) => {
+  console.log("\n========================================");
+  console.log("🔍 [getClaimsByVideo] ROUTE HIT!!!");
+  console.log("Full Request Query:", req.query);
+  console.log("Full Request Params:", req.params);
+  console.log("========================================\n");
+
+  try {
+    const { videoURL } = req.query;
+    console.log("[getClaimsByVideo] Extracted videoURL:", videoURL);
+
+    if (!videoURL) {
+      console.log("[getClaimsByVideo] ERROR: No videoURL provided");
+      return res.status(400).json({
+        error: "Missing required parameter: videoURL"
+      });
+    }
+
+    const result = await claimVerificationService.fetchClaimsByVideo(videoURL);
+    console.log("[getClaimsByVideo] Service returned:", JSON.stringify(result, null, 2));
+
+    return res.status(200).json({
+      videoURL: videoURL,
+      claimsCount: (result.claims || []).length,
+      claims: result.claims || []
+    });
+
+  } catch (error) {
+    console.error("Error fetching claims by video:", error);
+    return res.status(500).json({
+      error: "Failed to fetch claims by video",
+      details: error.message
+    });
+  }
+};
+
+/**
+ * GET /api/verify/claims/test-all
+ * DEBUG: Get ALL claims from database (no filtering)
+ */
+exports.getClaimsTestAll = async (req, res) => {
+  console.log("\n========================================");
+  console.log("🧪 [getClaimsTestAll] TEST ROUTE HIT!!!");
+  console.log("========================================\n");
+
+  try {
+    const db = getDb();
+    const allClaims = await db.collection("Claims").find({}).toArray();
+    
+    console.log("[getClaimsTestAll] Found", allClaims.length, "documents in Claims collection");
+    console.log("[getClaimsTestAll] Content:", JSON.stringify(allClaims, null, 2));
+
+    return res.status(200).json({
+      message: "All claims in database",
+      count: allClaims.length,
+      claims: allClaims
+    });
+
+  } catch (error) {
+    console.error("Error getting all claims:", error);
+    return res.status(500).json({
+      error: "Failed to get all claims",
+      details: error.message
+    });
+  }
+};

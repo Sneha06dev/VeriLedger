@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
+import { useNavigate , useLocation } from 'react-router-dom';
 import "../styles/results.css";
 
 const transcriptSteps = [
@@ -11,6 +11,7 @@ const transcriptSteps = [
 ];
 
 const Results = () => {
+  const navigate = useNavigate();
   const location = useLocation(); // gives info about current route
   const videoUrl = location.state?.videoUrl; 
   const company = location.state?.company;
@@ -23,6 +24,7 @@ const Results = () => {
   const [claims, setClaims] = useState([]);
   const [loadingClaims, setLoadingClaims] = useState(false);
   const [showClaims, setShowClaims] = useState(false);
+  
   
   const processSteps = async () => {
     for (let i = 0; i < transcriptSteps.length; i++) {
@@ -67,6 +69,42 @@ const Results = () => {
   useEffect(() => {
     processSteps();
   }, []);
+
+  useEffect(() => {
+  if (claims.length === 0) return;
+   let animationId = null;
+  const scrollToBottomSlowly = (duration = 2000) => { // duration in ms
+    const start = window.scrollY;
+    const end = document.body.scrollHeight;
+    const distance = end - start;
+    const startTime = performance.now();
+
+    const step = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1); // 0 → 1
+      window.scrollTo(0, start + distance * progress);
+      if (progress < 1)  animationId = requestAnimationFrame(step);
+    };
+
+    requestAnimationFrame(step);
+  };
+
+  scrollToBottomSlowly(5500);
+   const stopScroll = () => {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+  };
+
+  window.addEventListener("scroll", stopScroll, { passive: true });
+ 
+  return () => {
+    stopScroll();
+    window.removeEventListener("scroll", stopScroll);
+   
+  };
+}, [claims]);
 
   useEffect(() => {
     if (transcriptReady && videoUrl) {
@@ -277,7 +315,7 @@ const Results = () => {
         onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.03)")}
         onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
       >
-        <p><strong>Text:</strong> {claim.claimText}</p>
+        <p><strong>Claim:</strong> {claim.claimText}</p>
         <p><strong>Type:</strong> {claim.claimType}</p>
         <p><strong>Nature:</strong> {claim.claimNature}</p>
         <p><strong>Speaker:</strong> {claim.speaker}</p>
@@ -298,8 +336,37 @@ const Results = () => {
                 <p><b>Period:</b> {num.period}</p>
               </div>
             ))}
+            {/* Verify Claims Button */}
+
           </div>
         )}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+  <button
+    onClick={() => navigate("/verify-claims", { state: { videoUrl, claimText: claim.claimText,company } })}
+    style={{
+      marginTop: "20px",
+      padding: "10px 16px",
+      backgroundColor: "#2522d5",          // deep blue background
+      color: "white",
+      border: "2px solid #1b1aa8",        // slightly darker blue border
+      boxShadow: "0 4px 8px rgba(37, 34, 213, 0.4)", // subtle blueish shadow
+      cursor: "pointer",
+      borderRadius: "6px",
+      fontWeight: "bold",
+      transition: "all 0.2s ease-in-out",
+    }}
+    onMouseEnter={e => {
+      e.currentTarget.style.backgroundColor = "#3a38e0"; // lighter blue on hover
+      e.currentTarget.style.boxShadow = "0 6px 12px rgba(37, 34, 213, 0.6)";
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.backgroundColor = "#2522d5";
+      e.currentTarget.style.boxShadow = "0 4px 8px rgba(37, 34, 213, 0.4)";
+    }}
+  >
+    Verify Claim ➜
+  </button>
+</div>
       </div>
     ))}
   </div>

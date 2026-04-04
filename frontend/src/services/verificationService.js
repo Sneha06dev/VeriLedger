@@ -6,6 +6,45 @@
 const API_BASE = "http://localhost:5000/api";
 
 /**
+ * Fetch claims by video URL
+ * @param {string} videoURL - The video URL
+ * @returns {Promise<Object>} - List of claims from the video
+ */
+export async function fetchClaimsByVideo(videoURL) {
+  try {
+    console.log("\n[fetchClaimsByVideo CLIENT] Called with:", videoURL);
+    const params = new URLSearchParams({
+      videoURL
+    });
+    console.log("[fetchClaimsByVideo CLIENT] Sending query string:", params.toString());
+
+    const url = `${API_BASE}/verify/claims/by-video?${params}`;
+    console.log("[fetchClaimsByVideo CLIENT] Full URL:", url);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    console.log("[fetchClaimsByVideo CLIENT] Response status:", response.status);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.details || error.error || "Failed to fetch claims");
+    }
+
+    const data = await response.json();
+    console.log("[fetchClaimsByVideo CLIENT] Got data:", data);
+    return data;
+  } catch (error) {
+    console.error("[fetchClaimsByVideo CLIENT] ERROR:", error);
+    throw error;
+  }
+}
+
+/**
  * Verify a single claim
  * @param {string} claimText - The claim to verify
  * @param {string} company - Company symbol (e.g., AAPL, MSFT)

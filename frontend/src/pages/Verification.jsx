@@ -1,21 +1,61 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { verifySingleClaim, searchEvidence } from "../services/verificationService";
+import React, {  useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {fetchClaimsByVideo, verifySingleClaim, searchEvidence } from "../services/verificationService";
 import VerdictCard from "../components/VerdictCard";
 import EvidencePanel from "../components/EvidencePanel";
 import "../styles/Verification.css";
 
-const companies = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"];
+
 
 const Verification = () => {
-  const [claimText, setClaimText] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState("AAPL");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const initialCompany = location.state?.company || "";
+  const [company, setCompany] = useState(initialCompany);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [verdict, setVerdict] = useState(null);
   const [evidence, setEvidence] = useState([]);
   const [verificationStep, setVerificationStep] = useState(null); // null, "analyzing", "retrieving", "generating", "done"
-  const navigate = useNavigate();
+  // Claim passed via navigate
+  const initialClaim = location.state?.claimText || "";
+  const videoURL = location.state?.videoUrl || "";  // Match Results.jsx (lowercase 'u')
+// State for all claims fetched from DB
+  const [claimsList, setClaimsList] = useState([]);
+
+// State for selected claims
+  const [selectedClaims, setSelectedClaims] = useState(
+  initialClaim ? [initialClaim] : []
+);
+
+// Textarea reflects selected claims
+const [claimText, setClaimText] = useState(initialClaim);
+
+
+useEffect(() => {
+  const fetchClaims = async () => {
+    try {
+      console.log("[fetchClaims] Starting with videoURL:", videoURL);
+      const response = await fetchClaimsByVideo(videoURL);
+      console.log("[fetchClaims] API Response:", JSON.stringify(response, null, 2));
+      console.log("[fetchClaims] response.claims:", response.claims);
+      // response.claims = array of { claimText: "..." }
+      setClaimsList(response.claims || []);
+      console.log("[fetchClaims] Set claimsList to:", response.claims || []);
+
+      // Automatically check only the initial claim
+      if (initialClaim) {
+        setSelectedClaims([initialClaim]);
+        setClaimText(initialClaim);
+      }
+    } catch (err) {
+      console.error("Error fetching claims:", err);
+      setError("Failed to load claims from video");
+    }
+  };
+
+  if (videoURL) fetchClaims();
+}, [videoURL, initialClaim]);
   const handleVerify = async (e) => {
     e.preventDefault();
 
@@ -33,11 +73,11 @@ const Verification = () => {
     try {
       // Step 1: Search for evidence
       setVerificationStep("retrieving");
-      console.log(`Searching evidence for: "${claimText}" (${selectedCompany})`);
+      console.log(`Searching evidence for: "${claimText}" (${company})`);
 
       const evidenceResult = await searchEvidence({
         claimText,
-        company: selectedCompany,
+        company: company,
         topK: 5
       });
 
@@ -54,7 +94,7 @@ const Verification = () => {
       setVerificationStep("generating");
       console.log("Generating verdict based on evidence...");
 
-      const result = await verifySingleClaim(claimText, selectedCompany);
+      const result = await verifySingleClaim(claimText, company);
 
       setVerdict({
         verdict: result.verdict,
@@ -88,13 +128,14 @@ const Verification = () => {
 
   return (
     <div className="verification-container">
+      
       <button className="home-btn" onClick={() => navigate("/")}>
         ⬅ Home
       </button>
       {/* Header */}
       <div className="verification-header">
         <h1>Claim Verification</h1>
-        <p>Verify financial claims against SEC filings and corporate documents</p>
+        <p>Verify financial claims against SEC filings</p>
       </div>
 
       {/* Main Content */}
@@ -103,50 +144,62 @@ const Verification = () => {
         <div className="verification-input-panel">
           <form onSubmit={handleVerify}>
             {/* Claim Input */}
-            <div className="form-group">
-              <label>Financial Claim</label>
-              <textarea
-                value={claimText}
-                onChange={(e) => setClaimText(e.target.value)}
-                placeholder="Enter a financial claim from an earnings call (e.g., 'Revenue exceeded $400 billion in 2025')"
-                rows={4}
-                disabled={loading}
-                className="claim-textarea"
-              />
-            </div>
+            {/* Financial Claim Textarea */}
+<div className="form-group">
+  <label>Financial Claim(s)</label>
+  <textarea
+    value={claimText}
+    readOnly
+    rows={4}
+    className="claim-textarea"
+    placeholder="Selected claims will appear here"
+  />
+</div>
 
-            {/* Company Selection */}
-            <div className="form-group">
-              <label>Company</label>
-              <select
-                value={selectedCompany}
-                onChange={(e) => setSelectedCompany(e.target.value)}
-                disabled={loading}
-                className="company-select"
-              >
-                {companies.map(company => (
-                  <option key={company} value={company}>
-                    {company}
-                  </option>
-                ))}
-              </select>
-            </div>
+{/* Dynamic Claims List with Checkboxes */}
+{/* Dropdown for selecting a single claim */}
+<div className="form-group">
+  <label>Select any other Claim</label>
+  {claimsList.length > 0 ? (
+    <select
+      value={claimText}
+      onChange={(e) => {
+        setClaimText(e.target.value);
+        setSelectedClaims([e.target.value]); // update selectedClaims for consistency
+      }}
+      disabled={loading}
+      className="claim-dropdown"
+    >
+      <option value="" disabled>Select a claim...</option>
+      {claimsList.map((c, idx) => {
+        const text =  c; // handle both string or object
+        return (
+          <option key={idx} value={text}>
+            {text}
+          </option>
+        );
+      })}
+    </select>
+  ) : (
+    <p style={{ color: "#6b7280" }}>No claims found for this video</p>
+  )}
+</div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-verify"
-            >
-              {loading ? (
-                <>
-                  <span className="spinner"></span>
-                  Verifying...
-                </>
-              ) : (
-                "Verify Claim"
-              )}
-            </button>
+{/* Submit Button */}
+<button
+  type="submit"
+  disabled={loading || selectedClaims.length === 0}
+  className="btn-verify"
+>
+  {loading ? (
+    <>
+      <span className="spinner"></span>
+      Verifying...
+    </>
+  ) : (
+    "Verify Claim"
+  )}
+</button>
           </form>
 
           {/* Verification Steps */}

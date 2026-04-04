@@ -50,6 +50,14 @@ function App() {
               </ProtectedRoute>
             }
             />
+            <Route
+  path="/verify-claims"
+  element={
+    <ProtectedRoute>
+      <Verification />
+    </ProtectedRoute>
+  }
+/>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
