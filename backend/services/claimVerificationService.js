@@ -22,6 +22,38 @@ class ClaimVerificationService {
    * @param {string} company - Company name for context
    * @returns {Promise<Object>} - Verification results
    */
+ async fetchClaimsByVideo(videoURL) {
+  const db = getDb();
+  console.log("\n[fetchClaimsByVideo] Called with videoURL:", videoURL);
+
+  if (!videoURL) {
+    throw new Error("videoURL is required to fetch claims");
+  }
+
+  try {
+    // Directly query Claims collection by videoUrl (matches stored field name in DB)
+    console.log("[fetchClaimsByVideo] Querying Claims collection...");
+    const claimsDoc = await db.collection("Claims").findOne({ videoUrl: videoURL });
+    console.log("[fetchClaimsByVideo] Database result:", JSON.stringify(claimsDoc, null, 2));
+
+    if (!claimsDoc || !claimsDoc.claims || claimsDoc.claims.length === 0) {
+      console.log("[fetchClaimsByVideo] No claims found, returning empty array");
+      return { claims: [] }; // no claims found
+    }
+
+    // Map only claimText
+    const claims = claimsDoc.claims.map(claim => claim.claimText);
+    console.log("[fetchClaimsByVideo] Mapped claims:", claims);
+
+    return { claims };
+  } catch (err) {
+    console.error("[fetchClaimsByVideo] Error:", err);
+    throw err;
+  }
+}
+
+
+
   async verifyClaimsForTranscript(transcriptId, company) {
     const db = getDb();
 

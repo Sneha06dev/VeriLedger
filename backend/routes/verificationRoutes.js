@@ -21,6 +21,12 @@ router.get("/verify/claim/:claimId", verificationController.getClaimVerdict);
 // Verify single claim on-demand
 router.post("/verify/claim/single", verificationController.verifySingleClaim);
 
+// Fetch claims by video URL
+router.get("/claims/by-video", verificationController.getClaimsByVideo);
+
+// DEBUG: Get all claims in database
+router.get("/claims/test-all", verificationController.getClaimsTestAll);
+
 // Search for evidence
 router.get("/evidence/search", verificationController.searchEvidence);
 

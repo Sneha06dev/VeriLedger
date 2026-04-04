@@ -1,17 +1,33 @@
 /* Verification Page Styles */
 
 .verification-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+   position: fixed;      /* Make it cover the entire viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;         /* Full viewport width */
+  height: 100vh;        /* Full viewport height */
+  background: linear-gradient(105deg, #c9c9c9 0%, #b7d4ff 100%);
   padding: 20px;
+  overflow: auto;       /* Allows scrolling if content exceeds screen */
+  z-index: 999;
 }
 
+.claim-dropdown {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+}
 .verification-header {
   text-align: center;
   margin-bottom: 40px;
-  padding: 40px 20px;
+   margin: 0 auto 40px auto;
+  padding: 20px 20px;
   background: white;
   border-radius: 12px;
+  max-width: 400px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 

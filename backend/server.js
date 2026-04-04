@@ -14,6 +14,7 @@ const youtubeRoutes = require("./routes/youtubeRoutes");
 const authRoutes = require("./routes/authRoutes");
 const calendarRoutes = require("./routes/calendarRoutes");
 const claimRoutes = require("./routes/claimRoutes");
+const verificationRoutes = require("./routes/verificationRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 
 const app = express();
@@ -174,6 +175,7 @@ app.use("/api", youtubeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/calendar", calendarRoutes);
 app.use("/api/claims", claimRoutes);
+app.use("/api/verify", verificationRoutes);
 app.use("/api/user", userRoutes);
 // ===== TEST ROUTE =====
 app.get("/api/protected", authMiddleware, (req, res) => {
