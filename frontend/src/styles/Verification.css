@@ -1,5 +1,55 @@
 /* Verification Page Styles */
+/* Base Step Design */
+.step {
+  display: flex;
+  align-items: center; /* Vertical alignment for Tick and Text */
+  gap: 15px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background-color: #f9fafb; /* Default Off-white/Grey */
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  opacity: 1;
+}
 
+/* Hidden state */
+.step.hidden {
+  display: none;
+}
+
+/* ACTIVE State (Blue - while loading/processing) */
+.step.active {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+  border-left: 4px solid #3b82f6;
+}
+
+.step.active .step-indicator {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* COMPLETED State (Green - when tick appears) */
+/* This MUST come after .active in the CSS to override it */
+.step.completed {
+  background: #dcfce7 !important; /* The Green Box */
+  border: 1px solid #22c55e !important;
+  border-left: 4px solid #15803d !important;
+}
+
+.step.completed .step-indicator {
+  background-color: #22c55e !important;
+  color: white !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step.completed .step-title {
+  color: #14532d; /* Dark green text */
+  font-weight: 700;
+}
 .verification-container {
    position: fixed;      /* Make it cover the entire viewport */
   top: 0;
@@ -12,14 +62,7 @@
   z-index: 999;
 }
 
-.claim-dropdown {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-top: 5px;
-}
+
 .verification-header {
   text-align: center;
   margin-bottom: 40px;
@@ -73,7 +116,26 @@
   color: #1f2937;
   font-size: 14px;
 }
+.claim-dropdown {
+  width: 470px;          /* adjust width as needed */
+  padding: 6px 10px;     /* smaller padding for compact look */
+  font-size: 14px;       /* smaller font */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #2d2d2d;
+  color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
 
+.claim-dropdown:focus {
+  border-color: #4a90e2;   /* nice focus color */
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+.claim-dropdown option {
+  padding: 4px 6px;        /* optional: makes options slightly tighter */
+}
 .claim-textarea {
   width: 100%;
   padding: 12px;
