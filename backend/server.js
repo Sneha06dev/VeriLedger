@@ -13,7 +13,7 @@ const { connect, getDb } = require("./services/mongoClient");
 const youtubeRoutes = require("./routes/youtubeRoutes");
 const authRoutes = require("./routes/authRoutes");
 const calendarRoutes = require("./routes/calendarRoutes");
-
+const claimRoutes = require("./routes/claimRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 
 const app = express();
@@ -173,7 +173,7 @@ app.get("/api/transcript", async (req, res) => {
 app.use("/api", youtubeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/calendar", calendarRoutes);
-
+app.use("/api/claims", claimRoutes);
 app.use("/api/user", userRoutes);
 // ===== TEST ROUTE =====
 app.get("/api/protected", authMiddleware, (req, res) => {

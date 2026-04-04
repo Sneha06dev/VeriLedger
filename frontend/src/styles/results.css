@@ -1,19 +1,97 @@
 /* Container to keep everything centered */
 .results-page {
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
+  overflow-y: auto;
   width: 100%;
-  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   /* Keeping background clean so only cards stand out */
   /* background: #f0f7ff;  */
 }
+/* Make container FULL WIDTH */
+.results-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 20px 40px;
+}
+
+/* Grid layout for better spacing */
+.claims-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* Card styling */
+.claim-card {
+  width: 100%;
+  background: linear-gradient(135deg, #fcfcfcb3, #e0f7ff); /* light gradient */
+  color: #111; /* dark text for contrast */
+  padding: 20px 25px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* subtle shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+/* Hover effect - bulge + shadow */
+.claim-card:hover {
+  transform: scale(1.03) translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* ✨ BULGE EFFECT */
+.claim-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border: 1px solid #4f46e5;
+}
+
+/* Text styling */
+.claim-card p {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+/* Numerical section */
+.numerical-section {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #f0fcff, #d0f0ff);
+  border-left: 4px solid #00aaff;
+}
+
+/* Each numerical item */
+.numerical-item {
+  margin-top: 10px;
+  padding: 10px;
+  background: #ffffffaa; /* semi-transparent white */
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.numerical-item:hover {
+  background: #e0f7ff;
+}
+
+/* Optional: headings inside numerical section */
+.numerical-section p:first-child {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
 .final-transcript {
   padding: 20px;
-  background-color: rgb(189, 216, 225); /* preset color */
-  border-radius: 10px;
+  background: linear-gradient(135deg, #c8cbce, #eaeff7); /* preset color */
+ 
+  border: 1px solid #d4d4d6; 
+  border-radius: 12px;
+  
+  /* Creates a soft, floating shadow behind the whole card */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   max-width: 800px;
   margin: 20px auto;
   font-family: Arial, sans-serif;
@@ -67,6 +145,9 @@
   transform: translateY(0);
   /* optional: maybe change color or background */
   background-color: #d4edda; /* greenish for completed */
+}
+.claim-card:hover {
+  transform: scale(1.03) translateY(-4px);
 }
 .results-content {
   z-index: 2;
