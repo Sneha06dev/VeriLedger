@@ -45,7 +45,7 @@ const Home = () => {
       await response.json();
 
       
-      navigate("/results", { state: { videoUrl: youtubeLink }});
+      navigate("/results", { state: { videoUrl: youtubeLink, company: ytCompany }});
       
 
     } catch (err) {

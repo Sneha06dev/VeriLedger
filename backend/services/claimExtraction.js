@@ -1,205 +1,141 @@
 // claimExtraction.js
-
+// Use optional dependencies if available; provide offline fallback when not.
 let axios;
-try { axios = require("axios"); } catch (e) { axios = null; }
+try { axios = require('axios'); } catch (e) { axios = null; }
+let stopwords = [];
+try { stopwords = require('stopwords').english; } catch (e) { stopwords = []; }
 
-/* -----------------------------
-DIRECTION DETECTION
---------------------------------*/
-function detectDirection(text) {
-
-  const inc = /(increase|increased|grew|growth|rose|up|expanded|improved)/i;
-  const dec = /(decrease|declined|fell|drop|down|reduced|contracted)/i;
-
-  if (inc.test(text)) return "increase";
-  if (dec.test(text)) return "decrease";
-
-  return null;
-}
-
-/* -----------------------------
-METRIC DETECTION
---------------------------------*/
-function detectMetric(text) {
-
-  const metrics = {
-    revenue: /(revenue|sales|turnover)/i,
-    profit: /(profit|net income|earnings)/i,
-    margin: /(margin|operating margin|ebitda margin)/i,
-    cost: /(cost|expense|spending)/i,
-    growth: /(growth)/i,
-    users: /(users|customers|subscribers)/i
-  };
-
-  for (const key in metrics) {
-    if (metrics[key].test(text)) return key;
-  }
-
-  return "other";
-}
-
-/* -----------------------------
-VALUE EXTRACTION
---------------------------------*/
-function extractValue(text) {
-
-  const numberMatch = text.match(/\d+(\.\d+)?/);
-
-  if (!numberMatch) return null;
-
-  return Number(numberMatch[0]);
-}
-
-/* -----------------------------
-UNIT EXTRACTION
---------------------------------*/
-function extractUnit(text) {
-
-  if (/%/.test(text)) return "%";
-  if (/\$|usd/i.test(text)) return "USD";
-  if (/₹|inr/i.test(text)) return "INR";
-  if (/million/i.test(text)) return "million";
-  if (/billion/i.test(text)) return "billion";
-
-  return null;
-}
-
-/* -----------------------------
-COMPANY DETECTION
---------------------------------*/
-function detectCompany(text) {
-
-  const match = text.match(
-    /\b([A-Z][A-Za-z]+(?:\s[A-Z][A-Za-z]+)*)\b/
-  );
-
-  if (!match) return null;
-
-  return match[1];
-}
-
-/* -----------------------------
-TIMESTAMP DETECTION
---------------------------------*/
-function detectTimestamp(text) {
-
-  const match = text.match(/\d{2}:\d{2}:\d{3}/);
-
-  if (!match) return null;
-
-  return match[0];
-}
-
-/* -----------------------------
-TRANSCRIPT PREPROCESS
---------------------------------*/
+/**
+ * Step 1: Preprocess transcript
+ * - Remove greetings, filler words, noise
+ * - Optional: lowercasing, punctuation cleanup
+ */
 function preprocessTranscript(transcript) {
-
   let cleaned = transcript;
 
-  const filler = [
-    "uh", "um", "you know", "like",
-    "actually", "okay"
+  // Remove greetings / polite openings
+  const greetingPatterns = [
+    /good morning/i,
+    /good afternoon/i,
+    /hello/i,
+    /thank you/i,
+    /operator/i,
+    /you may now disconnect/i
   ];
-
-  filler.forEach(w => {
-    const r = new RegExp(`\\b${w}\\b`, "gi");
-    cleaned = cleaned.replace(r, "");
+  greetingPatterns.forEach(pattern => {
+    cleaned = cleaned.replace(pattern, '');
   });
 
-  cleaned = cleaned.replace(/\s+/g, " ").trim();
+  // 2 Remove filler words / common verbal pauses
+  const fillerWords = [
+    "uh", "um", "like", "you know", "so", "actually", "right", "let me see", "okay"
+  ];
+  fillerWords.forEach(word => {
+    const regex = new RegExp(`\\b${word}\\b`, "gi");
+    cleaned = cleaned.replace(regex, '');
+  });
+
+  // 3 Remove audio timestamps like [00:01:23] but keep calendar dates
+  cleaned = cleaned.replace(/\[\d{1,2}:\d{2}(?::\d{2})?\]/g, '');
+
+  // 4Remove inaudible / noise markers
+  cleaned = cleaned.replace(/\(inaudible\)|\(laughter\)|\(\w+\)/gi, '');
+
+  //  Normalize numbers (remove commas in large numbers if needed for parsing)
+  // This keeps numeric values intact
+  cleaned = cleaned.replace(/(\d),(\d)/g, '$1$2');
+
+  //  Normalize whitespace & line breaks
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+
+  //Ensure sentences are separated properly (optional, helps Gemini)
+  cleaned = cleaned.replace(/([a-z])\s*([A-Z])/g, '$1. $2');
 
   return cleaned;
 }
 
-/* -----------------------------
-CLAIM EXTRACTION LOGIC
---------------------------------*/
-function extractStructuredClaims(transcript) {
-
-  const sentences = transcript.split(/[.!?]/);
-
-  const claims = [];
-
-  sentences.forEach((s, idx) => {
-
-    const text = s.trim();
-
-    if (text.length < 20) return;
-
-    const direction = detectDirection(text);
-    const metric = detectMetric(text);
-    const value = extractValue(text);
-    const unit = extractUnit(text);
-    const company = detectCompany(text);
-    const timestamp = detectTimestamp(text);
-
-    claims.push({
-      company,
-      speaker: null,
-      claimType: "strategic",
-      metric,
-      value,
-      unit,
-      direction,
-      timestamp,
-      confidence: 0.85,
-      originalText: text
-    });
-
-  });
-
-  return claims;
-}
-
-/* -----------------------------
-GEMINI PROMPT
---------------------------------*/
+/**
+ * Step 2: Generate prompt for Gemini
+ */
 function generateGeminiPrompt(transcript) {
-
   return `
-Extract claims from this transcript.
+You are an AI that extracts actionable claims from corporate transcripts. 
 
-Return JSON format:
-
-{
- "claims":[
-  {
-   "company":"",
-   "speaker":"",
-   "claimType":"",
-   "metric":"",
-   "value":null,
-   "unit":"",
-   "direction":"",
-   "timestamp":"",
-   "confidence":0.0,
-   "originalText":""
-  }
- ]
-}
+Instructions:
+1. Read the transcript carefully.
+2. Identify key statements that are claims, financial updates, strategic plans, acquisitions, or milestones.
+3. Output JSON with an array called "claims".
+4. Each claim should have these fields:
+   - "claimText": the exact sentence or idea from the transcript
+   - "claimType": one of ["financial", "strategic", "operational", "acquisition", "milestone","guidance","risk"]
+   -"claimNature": one of ["historical","current","forward_looking","trend"]
+   - "speaker": who said it (if available)
+   -  "numericalData": [
+    {
+      "metric": "string", 
+      "value": "number",
+      "unit": "string", 
+      "direction": "increase | decrease | neutral",
+      "period": "string"
+    }
+  ],
+   
+   
+Output only JSON. Do not add any extra text.
 
 Transcript:
-${transcript}
+"${transcript}"
 `;
 }
 
-/* -----------------------------
-CALL GEMINI
---------------------------------*/
+/**
+ * Step 3: Call Gemini API for claim extraction
+ * Replace GEMINI_API_KEY and GEMINI_ENDPOINT with actual credentials
+ */
+// async function extractClaimsWithGemini(transcript) {
+//   const cleanedTranscript = preprocessTranscript(transcript);
+//   const prompt = generateGeminiPrompt(cleanedTranscript);
+
+//   // 1. Correct URL (using v1beta or v1)
+//   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+
+//   try {
+//     const response = await axios.post(url, {
+//       // 2. Correct Payload Structure
+//       contents: [{
+//         parts: [{ text: prompt }]
+//       }],
+//       generationConfig: {
+//         temperature: 0,
+//         response_mime_type: "application/json" // 3. Forces JSON output
+//       }
+//     }, {
+//       headers: { 'Content-Type': 'application/json' }
+//     });
+
+//     // 4. Correct Response Extraction
+//     const rawText = response.data.candidates[0].content.parts[0].text;
+    
+//     return JSON.parse(rawText);
+//   } catch (e) {
+//     console.error("Gemini API Error:", e.response ? e.response.data : e.message);
+//     return { claims: [] };
+//   }
+// }
+
+// module.exports = { extractClaimsWithGemini, preprocessTranscript };
 async function extractClaimsWithGemini(transcript) {
+  if (!axios) throw new Error("Axios is required for Gemini API calls");
 
-  if (!axios) throw new Error("Axios required");
+  // debug key presence
+  console.log('extractClaimsWithGemini: GEMINI_API_KEY=', process.env.GEMINI_API_KEY ? '<present>' : '<missing>');
 
-  const cleaned = preprocessTranscript(transcript);
+  const cleanedTranscript = preprocessTranscript(transcript);
+  const prompt = generateGeminiPrompt(cleanedTranscript);
 
-  const prompt = generateGeminiPrompt(cleaned);
-
-  const url =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
   try {
-
     const response = await axios.post(
       url,
       {
@@ -217,22 +153,15 @@ async function extractClaimsWithGemini(transcript) {
       }
     );
 
-    const raw = response.data.candidates[0].content.parts[0].text;
+    // Extract text from response
+    const rawText = response.data.candidates[0].content.parts[0].text;
 
-    return JSON.parse(raw);
-
+    // Return parsed JSON
+    return JSON.parse(rawText);
   } catch (e) {
-
-    console.error("Gemini API Error:",
-      e.response ? e.response.data : e.message
-    );
-
+    console.error("Gemini API Error:", e.response ? e.response.data : e.message);
     return { claims: [] };
   }
 }
 
-module.exports = {
-  preprocessTranscript,
-  extractStructuredClaims,
-  extractClaimsWithGemini
-};
+module.exports = { extractClaimsWithGemini, preprocessTranscript };
